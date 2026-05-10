@@ -17,7 +17,7 @@ import {
 import { useSendPoke } from '@/hooks/useSendPoke';
 import { useCurrentUid } from '@/hooks/useCurrentUid';
 import { useDemoMode } from '@/demo/demoMode';
-import { DEMO_RELATIONSHIPS } from '@/demo/demoData';
+import { DEMO_RELATIONSHIPS, DEMO_USER, useDemoVersion } from '@/demo/demoData';
 import { KokCard } from '@/components/KokCard';
 import { KokWord } from '@/components/KokWord';
 import { KokToast } from '@/components/KokToast';
@@ -35,6 +35,9 @@ export default function PokeScreen() {
   const isDemo = useDemoMode();
   const uid = useCurrentUid();
   const { user } = useUser(uid);
+  // 데모 모드: DEMO_USER 의 mutable favoriteEmojis 를 매 bump 마다 직접 읽음
+  // (useUser useEffect 타이밍에 의존하지 않게).
+  useDemoVersion();
   const { send, pending } = useSendPoke();
   const [rel, setRel] = useState<RelationshipDoc | null>(null);
   const sentPokes = usePokesForRelationship(relId ?? null, 'sent', uid);
@@ -63,8 +66,12 @@ export default function PokeScreen() {
   const otherUid = rel?.members.find((m) => m !== uid) ?? '';
   const nickname = rel?.nicknames?.[uid ?? ''] ?? '친구';
   const lastSent = sentPokes[0] ?? null;
+  // 데모 모드면 DEMO_USER 직접 참조 (useUser state 가 stale 할 가능성 회피).
+  const favoriteSource = isDemo
+    ? DEMO_USER.favoriteEmojis
+    : user?.favoriteEmojis;
   const favorites = (
-    user?.favoriteEmojis?.length ? user.favoriteEmojis : DEFAULT_FAVORITES
+    favoriteSource?.length ? favoriteSource : DEFAULT_FAVORITES
   ).slice(0, 6);
 
   async function onSend(emojiId: string) {
