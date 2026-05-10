@@ -224,3 +224,86 @@ export function demoHistory(
     (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis(),
   );
 }
+
+// ─── 데모 mutable state + 구독 ────────────────────────────────────────
+// useSyncExternalStore 기반. mutate 시 version 증가 → 구독한 hook 재실행.
+
+let demoVersion = 0;
+const versionListeners = new Set<() => void>();
+
+function bumpDemo() {
+  demoVersion += 1;
+  for (const l of versionListeners) l();
+}
+
+function subscribeDemo(cb: () => void) {
+  versionListeners.add(cb);
+  return () => {
+    versionListeners.delete(cb);
+  };
+}
+
+export function getDemoVersion(): number {
+  return demoVersion;
+}
+
+// React hook: 컴포넌트가 데모 데이터 변경에 반응해 re-render.
+import { useSyncExternalStore } from 'react';
+export function useDemoVersion(): number {
+  return useSyncExternalStore(
+    subscribeDemo,
+    () => demoVersion,
+    () => demoVersion,
+  );
+}
+
+// ─── Mutators ────────────────────────────────────────────────────────
+
+function nowTs(): FirebaseFirestoreTypes.Timestamp {
+  return ts(0);
+}
+
+export function addDemoPoke(input: {
+  fromUid: string;
+  toUid: string;
+  relId: string;
+  emojiId: string;
+  replyToPokeId?: string | null;
+}): string {
+  const id = `demo-poke-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  const created = nowTs();
+  DEMO_POKES.unshift({
+    id,
+    fromUid: input.fromUid,
+    toUid: input.toUid,
+    relId: input.relId,
+    emojiId: input.emojiId,
+    replyToPokeId: input.replyToPokeId ?? null,
+    createdAt: created,
+  });
+  // 관계의 lastPoke 갱신
+  const rel = DEMO_RELATIONSHIPS.find((r) => r.id === input.relId);
+  if (rel) {
+    rel.lastPokeAt = created;
+    rel.lastPokeEmojiId = input.emojiId;
+  }
+  // 내가 보낸 콕은 상대가 unread 가 되지만 데모는 자기 시점이라 영향 없음.
+  // 내가 받은 콕(시연 시 외부 트리거가 없으므로 잘 안 발생)이면 unread 추가.
+  if (input.toUid === DEMO_UID) {
+    DEMO_UNREAD_REL_IDS.add(input.relId);
+  } else {
+    // 내가 보낸 직후엔 그 관계 unread 해제 (응답 후 자연스러움).
+    DEMO_UNREAD_REL_IDS.delete(input.relId);
+  }
+  bumpDemo();
+  return id;
+}
+
+export function updateDemoFavorites(favorites: string[]) {
+  DEMO_USER.favoriteEmojis = [...favorites];
+  bumpDemo();
+}
+
+export function markDemoRelRead(relId: string) {
+  if (DEMO_UNREAD_REL_IDS.delete(relId)) bumpDemo();
+}

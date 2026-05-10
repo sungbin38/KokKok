@@ -7,8 +7,10 @@ import { useDemoMode } from '@/demo/demoMode';
 import {
   demoLastPokeReceived,
   demoLatestUnreadReceivedPoke,
+  demoPokesFor,
   isDemoFavorite,
   isDemoUnread,
+  DEMO_UID,
 } from '@/demo/demoData';
 import { Avatar } from '@/components/Avatar';
 import { KokWord } from '@/components/KokWord';
@@ -133,12 +135,23 @@ export default function Home() {
                 uid={uid}
                 hue={HUES[index % HUES.length]}
                 isDemo={isDemo}
-                onPress={() =>
+                onPress={() => {
+                  // 데모: unread 상대는 받은 콕 화면, 그 외엔 send 화면.
+                  if (isDemo && isDemoUnread(item.id)) {
+                    const latest = demoPokesFor(item.id, 'received', DEMO_UID)[0];
+                    if (latest) {
+                      router.push({
+                        pathname: '/poke-received/[pokeId]',
+                        params: { pokeId: latest.id },
+                      });
+                      return;
+                    }
+                  }
                   router.push({
                     pathname: '/poke/[relId]',
                     params: { relId: item.id },
-                  })
-                }
+                  });
+                }}
               />
             )}
           />

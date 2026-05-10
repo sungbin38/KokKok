@@ -14,9 +14,12 @@ import {
   DEMO_RELATIONSHIPS,
   DEMO_UID,
   DEMO_USER,
+  addDemoPoke,
   demoHistory,
   demoPokesFor,
   findDemoPoke,
+  updateDemoFavorites,
+  useDemoVersion,
 } from '@/demo/demoData';
 
 const db = firestore();
@@ -42,8 +45,8 @@ export async function sendPoke(input: {
   replyToPokeId?: string | null;
 }): Promise<string> {
   if (isDemoMode()) {
-    // 데모: 실제 write 없이 가짜 ID 반환.
-    return `demo-${Date.now()}`;
+    // 데모: in-memory store 에 추가 → 구독자 re-render.
+    return addDemoPoke(input);
   }
   const ref = await pokesCol().add({
     fromUid: input.fromUid,
@@ -67,16 +70,22 @@ export async function updateFavoriteEmojis(
   uid: string,
   favoriteEmojis: string[],
 ) {
-  if (isDemoMode()) return;
+  if (isDemoMode()) {
+    updateDemoFavorites(favoriteEmojis);
+    return;
+  }
   await usersCol().doc(uid).update({ favoriteEmojis });
 }
 
 export function useUser(uid: string | null | undefined) {
   const [user, setUser] = useState<UserDoc | null>(null);
   const [loading, setLoading] = useState(true);
+  const demoVersion = useDemoVersion();
   useEffect(() => {
     if (isDemoMode()) {
-      setUser(DEMO_USER);
+      // DEMO_USER 객체 자체는 같은 reference 지만 favoriteEmojis 가 갱신됐을 수
+      // 있으므로 spread 로 새 reference 만들어 setState 트리거.
+      setUser({ ...DEMO_USER });
       setLoading(false);
       return;
     }
@@ -92,16 +101,23 @@ export function useUser(uid: string | null | undefined) {
         setLoading(false);
       });
     return unsub;
-  }, [uid]);
+  }, [uid, demoVersion]);
   return { user, loading };
 }
 
 export function useRelationships(uid: string | null | undefined) {
   const [items, setItems] = useState<RelationshipDoc[]>([]);
   const [loading, setLoading] = useState(true);
+  const demoVersion = useDemoVersion();
   useEffect(() => {
     if (isDemoMode()) {
-      setItems(DEMO_RELATIONSHIPS);
+      // 최신 lastPokeAt 기준 정렬해서 새 array 로 set.
+      const sorted = [...DEMO_RELATIONSHIPS].sort((a, b) => {
+        const am = a.lastPokeAt?.toMillis() ?? 0;
+        const bm = b.lastPokeAt?.toMillis() ?? 0;
+        return bm - am;
+      });
+      setItems(sorted);
       setLoading(false);
       return;
     }
@@ -120,7 +136,7 @@ export function useRelationships(uid: string | null | undefined) {
         setLoading(false);
       });
     return unsub;
-  }, [uid]);
+  }, [uid, demoVersion]);
   return { items, loading };
 }
 
@@ -130,6 +146,7 @@ export function usePokesForRelationship(
   uid: string | null,
 ) {
   const [items, setItems] = useState<PokeDoc[]>([]);
+  const demoVersion = useDemoVersion();
   useEffect(() => {
     if (isDemoMode()) {
       if (!relId) {
@@ -150,7 +167,7 @@ export function usePokesForRelationship(
         setItems(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
       });
     return unsub;
-  }, [relId, direction, uid]);
+  }, [relId, direction, uid, demoVersion]);
   return items;
 }
 
@@ -159,6 +176,7 @@ export function useHistory(
   direction: 'sent' | 'received',
 ) {
   const [items, setItems] = useState<PokeDoc[]>([]);
+  const demoVersion = useDemoVersion();
   useEffect(() => {
     if (isDemoMode()) {
       setItems(demoHistory(direction, DEMO_UID));
@@ -174,7 +192,7 @@ export function useHistory(
         setItems(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
       });
     return unsub;
-  }, [uid, direction]);
+  }, [uid, direction, demoVersion]);
   return items;
 }
 
