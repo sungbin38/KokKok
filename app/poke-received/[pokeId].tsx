@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 const firestoreModule = require('@react-native-firebase/firestore');
 const firestore: any = firestoreModule.default ?? firestoreModule;
@@ -32,6 +32,7 @@ export default function PokeReceived() {
   const [poke, setPoke] = useState<PokeDoc | null>(null);
   const [fromName, setFromName] = useState<string>('');
   const [replied, setReplied] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!pokeId) return;
@@ -115,26 +116,28 @@ export default function PokeReceived() {
         }}
       />
 
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingTop: insets.top }}>
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingHorizontal: 18,
-            paddingTop: 8,
-            height: 44,
+            paddingTop: 12,
+            paddingBottom: 4,
+            minHeight: 52,
           }}
         >
-          <View style={{ width: 40 }} />
+          <View style={{ width: 60 }} />
           <Pressable
             onPress={() => router.back()}
+            hitSlop={12}
             style={({ pressed }) => ({
-              paddingHorizontal: 14,
-              paddingVertical: 8,
+              paddingHorizontal: 16,
+              paddingVertical: 10,
               borderRadius: 999,
-              backgroundColor: 'rgba(27,22,18,0.05)',
-              opacity: pressed ? 0.7 : 1,
+              backgroundColor: 'rgba(27,22,18,0.06)',
+              opacity: pressed ? 0.6 : 1,
             })}
           >
             <Text
@@ -153,7 +156,7 @@ export default function PokeReceived() {
         <View
           style={{
             paddingHorizontal: 24,
-            paddingTop: 8,
+            paddingTop: 4,
             flexDirection: 'row',
             alignItems: 'center',
             gap: 10,
@@ -195,7 +198,7 @@ export default function PokeReceived() {
           </PulseCircle>
         </View>
 
-        <View style={{ paddingHorizontal: 24, paddingBottom: 28 }}>
+        <View style={{ paddingHorizontal: 24, paddingBottom: Math.max(insets.bottom, 16) + 12 }}>
           <View style={{ alignItems: 'center', marginBottom: 18 }}>
             <Text
               style={{
@@ -265,7 +268,7 @@ export default function PokeReceived() {
             disabled={replied}
           />
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
