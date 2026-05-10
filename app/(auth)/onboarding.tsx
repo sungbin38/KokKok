@@ -16,6 +16,7 @@ import { PressableButton } from '@/components/PressableButton';
 import { KokLogo } from '@/components/KokLogo';
 import { KokWord } from '@/components/KokWord';
 import { colors } from '@/theme';
+import { enableDemoMode } from '@/demo/demoMode';
 
 const FLOATERS: { e: string; rot: number; dy: number; delay: number }[] = [
   { e: '❤️', rot: -10, dy: 8, delay: 0 },
@@ -27,6 +28,22 @@ const FLOATERS: { e: string; rot: number; dy: number; delay: number }[] = [
 export default function Onboarding() {
   const router = useRouter();
   const [loading, setLoading] = useState<'apple' | 'google' | null>(null);
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleSecretTap() {
+    tapCountRef.current += 1;
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+    if (tapCountRef.current >= 3) {
+      tapCountRef.current = 0;
+      enableDemoMode();
+      router.replace('/(tabs)/home');
+      return;
+    }
+    tapTimerRef.current = setTimeout(() => {
+      tapCountRef.current = 0;
+    }, 1500);
+  }
 
   async function handleApple() {
     try {
@@ -125,19 +142,21 @@ export default function Onboarding() {
             </View>
           </View>
 
-          <Text
-            style={{
-              fontSize: 15,
-              color: colors.inkSoft,
-              textAlign: 'center',
-              letterSpacing: -0.2,
-              lineHeight: 22,
-              marginTop: 6,
-              maxWidth: 280,
-            }}
-          >
-            긴 메시지 없이도 충분해요.{'\n'}아이콘 하나로 안부를 보내보세요.
-          </Text>
+          <Pressable onPress={handleSecretTap} hitSlop={12}>
+            <Text
+              style={{
+                fontSize: 15,
+                color: colors.inkSoft,
+                textAlign: 'center',
+                letterSpacing: -0.2,
+                lineHeight: 22,
+                marginTop: 6,
+                maxWidth: 280,
+              }}
+            >
+              긴 메시지 없이도 충분해요.{'\n'}아이콘 하나로 안부를 보내보세요.
+            </Text>
+          </Pressable>
         </View>
 
         <View style={{ paddingHorizontal: 24, paddingBottom: 24, gap: 10 }}>

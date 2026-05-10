@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { Alert, FlatList, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import auth from '@react-native-firebase/auth';
 import { useUser, updateFavoriteEmojis } from '@/firebase/firestore';
+import { useCurrentUid } from '@/hooks/useCurrentUid';
 import {
   CATEGORIES,
   DEFAULT_FAVORITES,
@@ -17,7 +17,7 @@ import { colors, radius } from '@/theme';
 const ALL: EmojiCategory | '전체' = '전체';
 
 export default function PickerScreen() {
-  const uid = auth().currentUser?.uid ?? null;
+  const uid = useCurrentUid();
   const router = useRouter();
   const { user } = useUser(uid);
   const initial = user?.favoriteEmojis?.length

@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import auth from '@react-native-firebase/auth';
 import {
   useHistory,
   useRelationships,
   useUser,
 } from '@/firebase/firestore';
+import { useCurrentUid } from '@/hooks/useCurrentUid';
 import { Avatar } from '@/components/Avatar';
 import { MiniNav, NavIconButton } from '@/components/MiniNav';
 import { colors, radius, shadow } from '@/theme';
@@ -34,7 +34,7 @@ interface DayEntry {
 type TimelineItem = BubbleEntry | DayEntry;
 
 export default function History() {
-  const uid = auth().currentUser?.uid ?? null;
+  const uid = useCurrentUid();
   const router = useRouter();
   const { user } = useUser(uid);
   const { items: relationships } = useRelationships(uid);

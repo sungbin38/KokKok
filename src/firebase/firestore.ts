@@ -9,6 +9,15 @@ import {
   RelationshipDoc,
   UserDoc,
 } from './types';
+import { isDemoMode } from '@/demo/demoMode';
+import {
+  DEMO_RELATIONSHIPS,
+  DEMO_UID,
+  DEMO_USER,
+  demoHistory,
+  demoPokesFor,
+  findDemoPoke,
+} from '@/demo/demoData';
 
 const db = firestore();
 
@@ -32,6 +41,10 @@ export async function sendPoke(input: {
   emojiId: string;
   replyToPokeId?: string | null;
 }): Promise<string> {
+  if (isDemoMode()) {
+    // 데모: 실제 write 없이 가짜 ID 반환.
+    return `demo-${Date.now()}`;
+  }
   const ref = await pokesCol().add({
     fromUid: input.fromUid,
     toUid: input.toUid,
@@ -54,6 +67,7 @@ export async function updateFavoriteEmojis(
   uid: string,
   favoriteEmojis: string[],
 ) {
+  if (isDemoMode()) return;
   await usersCol().doc(uid).update({ favoriteEmojis });
 }
 
@@ -61,6 +75,11 @@ export function useUser(uid: string | null | undefined) {
   const [user, setUser] = useState<UserDoc | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
+    if (isDemoMode()) {
+      setUser(DEMO_USER);
+      setLoading(false);
+      return;
+    }
     if (!uid) {
       setUser(null);
       setLoading(false);
@@ -81,6 +100,11 @@ export function useRelationships(uid: string | null | undefined) {
   const [items, setItems] = useState<RelationshipDoc[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
+    if (isDemoMode()) {
+      setItems(DEMO_RELATIONSHIPS);
+      setLoading(false);
+      return;
+    }
     if (!uid) {
       setItems([]);
       setLoading(false);
@@ -107,6 +131,14 @@ export function usePokesForRelationship(
 ) {
   const [items, setItems] = useState<PokeDoc[]>([]);
   useEffect(() => {
+    if (isDemoMode()) {
+      if (!relId) {
+        setItems([]);
+        return;
+      }
+      setItems(demoPokesFor(relId, direction, DEMO_UID));
+      return;
+    }
     if (!relId || !uid) return;
     const field = direction === 'sent' ? 'fromUid' : 'toUid';
     const unsub = pokesCol()
@@ -128,6 +160,10 @@ export function useHistory(
 ) {
   const [items, setItems] = useState<PokeDoc[]>([]);
   useEffect(() => {
+    if (isDemoMode()) {
+      setItems(demoHistory(direction, DEMO_UID));
+      return;
+    }
     if (!uid) return;
     const field = direction === 'sent' ? 'fromUid' : 'toUid';
     const unsub = pokesCol()
@@ -143,6 +179,7 @@ export function useHistory(
 }
 
 export async function getPoke(pokeId: string): Promise<PokeDoc | null> {
+  if (isDemoMode()) return findDemoPoke(pokeId);
   const snap = await pokesCol().doc(pokeId).get();
   if (!snap.exists) return null;
   return { id: snap.id, ...(snap.data() as any) } as PokeDoc;

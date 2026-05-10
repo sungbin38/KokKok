@@ -10,23 +10,26 @@ import { useAuthState } from '@/firebase/auth-state';
 import { configureGoogleSignIn } from '@/firebase/auth';
 import { usePushHandler } from '@/hooks/usePushHandler';
 import { GOOGLE_WEB_CLIENT_ID } from '@/config';
+import { useDemoMode } from '@/demo/demoMode';
 
 export default function RootLayout() {
   configureGoogleSignIn(GOOGLE_WEB_CLIENT_ID);
   const { user, initializing } = useAuthState();
   const segments = useSegments();
   const router = useRouter();
+  const demo = useDemoMode();
   usePushHandler(user?.uid ?? null);
 
   useEffect(() => {
     if (initializing) return;
+    if (demo) return;
     const inAuthFlow = segments[0] === '(auth)';
     if (!user && !inAuthFlow) {
       router.replace('/(auth)/onboarding');
     } else if (user && inAuthFlow) {
       router.replace('/(tabs)/home');
     }
-  }, [user, initializing, segments, router]);
+  }, [user, initializing, segments, router, demo]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

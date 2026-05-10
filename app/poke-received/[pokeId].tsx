@@ -9,10 +9,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+const firestoreModule = require('@react-native-firebase/firestore');
+const firestore: any = firestoreModule.default ?? firestoreModule;
 import { getPoke, useUser } from '@/firebase/firestore';
 import { useSendPoke } from '@/hooks/useSendPoke';
+import { useCurrentUid } from '@/hooks/useCurrentUid';
+import { useDemoMode } from '@/demo/demoMode';
+import { DEMO_RELATIONSHIPS } from '@/demo/demoData';
 import { Avatar } from '@/components/Avatar';
 import { PressableButton } from '@/components/PressableButton';
 import { colors, shadow } from '@/theme';
@@ -22,7 +25,8 @@ import type { PokeDoc } from '@/firebase/types';
 export default function PokeReceived() {
   const { pokeId } = useLocalSearchParams<{ pokeId: string }>();
   const router = useRouter();
-  const uid = auth().currentUser?.uid ?? null;
+  const isDemo = useDemoMode();
+  const uid = useCurrentUid();
   const { user } = useUser(uid);
   const { send, pending } = useSendPoke();
   const [poke, setPoke] = useState<PokeDoc | null>(null);
@@ -38,13 +42,20 @@ export default function PokeReceived() {
         return;
       }
       setPoke(p);
+      if (isDemo) {
+        // 데모: relationships 의 nicknames 에서 발신자 표시명 추출.
+        const rel = DEMO_RELATIONSHIPS.find((r) => r.id === p.relId);
+        const nick = rel?.nicknames?.[uid ?? ''] ?? '친구';
+        setFromName(nick);
+        return;
+      }
       const fromSnap = await firestore()
         .collection('users')
         .doc(p.fromUid)
         .get();
       setFromName((fromSnap.data()?.displayName as string) ?? '누군가');
     })();
-  }, [pokeId, router]);
+  }, [pokeId, router, isDemo, uid]);
 
   async function handleReply(emojiId: string) {
     if (!uid || !poke) return;

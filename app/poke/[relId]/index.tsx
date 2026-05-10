@@ -8,13 +8,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+const firestoreModule = require('@react-native-firebase/firestore');
+const firestore: any = firestoreModule.default ?? firestoreModule;
 import {
   useUser,
   usePokesForRelationship,
 } from '@/firebase/firestore';
 import { useSendPoke } from '@/hooks/useSendPoke';
+import { useCurrentUid } from '@/hooks/useCurrentUid';
+import { useDemoMode } from '@/demo/demoMode';
+import { DEMO_RELATIONSHIPS } from '@/demo/demoData';
 import { KokCard } from '@/components/KokCard';
 import { KokWord } from '@/components/KokWord';
 import { KokToast } from '@/components/KokToast';
@@ -29,7 +32,8 @@ import type { RelationshipDoc } from '@/firebase/types';
 export default function PokeScreen() {
   const { relId } = useLocalSearchParams<{ relId: string }>();
   const router = useRouter();
-  const uid = auth().currentUser?.uid ?? null;
+  const isDemo = useDemoMode();
+  const uid = useCurrentUid();
   const { user } = useUser(uid);
   const { send, pending } = useSendPoke();
   const [rel, setRel] = useState<RelationshipDoc | null>(null);
@@ -40,16 +44,21 @@ export default function PokeScreen() {
 
   useEffect(() => {
     if (!relId) return;
+    if (isDemo) {
+      const found = DEMO_RELATIONSHIPS.find((r) => r.id === relId) ?? null;
+      setRel(found);
+      return;
+    }
     const unsub = firestore()
       .collection('relationships')
       .doc(relId)
-      .onSnapshot((snap) => {
+      .onSnapshot((snap: any) => {
         if (snap.exists) {
           setRel({ id: snap.id, ...(snap.data() as any) });
         }
       });
     return unsub;
-  }, [relId]);
+  }, [relId, isDemo]);
 
   const otherUid = rel?.members.find((m) => m !== uid) ?? '';
   const nickname = rel?.nicknames?.[uid ?? ''] ?? '친구';

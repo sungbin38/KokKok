@@ -1,8 +1,8 @@
 import { FlatList, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import auth from '@react-native-firebase/auth';
 import { useRelationships } from '@/firebase/firestore';
+import { useCurrentUid } from '@/hooks/useCurrentUid';
 import { Avatar } from '@/components/Avatar';
 import { KokLogo } from '@/components/KokLogo';
 import { PressableButton } from '@/components/PressableButton';
@@ -11,7 +11,7 @@ import { getEmoji } from '@/data/emojis';
 import { timeAgo } from '@/utils/time';
 
 export default function Home() {
-  const uid = auth().currentUser?.uid ?? null;
+  const uid = useCurrentUid();
   const router = useRouter();
   const { items, loading } = useRelationships(uid);
 

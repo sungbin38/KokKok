@@ -2,17 +2,17 @@ import { useState, type ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import auth from '@react-native-firebase/auth';
 import {
   useRelationships,
   useUser,
 } from '@/firebase/firestore';
 import { signOut } from '@/firebase/auth';
 import { unregisterCurrentToken } from '@/firebase/push';
+import { useCurrentUid } from '@/hooks/useCurrentUid';
 import { colors, radius, shadow } from '@/theme';
 
 export default function Me() {
-  const uid = auth().currentUser?.uid ?? null;
+  const uid = useCurrentUid();
   const { user } = useUser(uid);
   const { items: relationships } = useRelationships(uid);
   const router = useRouter();
