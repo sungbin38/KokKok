@@ -287,16 +287,16 @@ export default function PokeScreen() {
           style={{
             flex: 1,
             paddingHorizontal: 20,
-            paddingTop: 14,
-            paddingBottom: 28,
-            justifyContent: 'flex-end',
+            paddingTop: 20,
+            paddingBottom: 16,
           }}
         >
           <View
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
-              gap: 12,
+              rowGap: 16,
+              columnGap: 12,
               justifyContent: 'space-between',
             }}
           >
@@ -328,8 +328,9 @@ export default function PokeScreen() {
             }
             style={({ pressed }) => ({
               alignSelf: 'center',
-              marginTop: 16,
-              padding: 8,
+              marginTop: 'auto',
+              paddingTop: 16,
+              paddingBottom: 4,
               opacity: pressed ? 0.6 : 1,
             })}
           >

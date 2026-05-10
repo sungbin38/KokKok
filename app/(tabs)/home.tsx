@@ -118,11 +118,11 @@ export default function Home() {
           <FlatList
             data={items}
             keyExtractor={(item) => item.id}
+            style={{ flex: 1, width: '100%' }}
             contentContainerStyle={{
               paddingHorizontal: 16,
               paddingTop: 8,
               paddingBottom: 24,
-              gap: 4,
             }}
             ListFooterComponent={
               <InviteFooter onPress={() => router.push('/invite')} />
@@ -175,15 +175,16 @@ function RelationshipRow({
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         flexDirection: 'row',
         alignItems: 'center',
+        width: '100%',
         paddingVertical: 12,
         paddingHorizontal: 8,
-        opacity: pressed ? 0.65 : 1,
-      })}
+      }}
+      android_ripple={{ color: 'rgba(0,0,0,0.04)' }}
     >
-      <View>
+      <View style={{ width: 56, height: 56 }}>
         <Avatar name={nickname} size={56} hue={hue} />
         {unread && (
           <View

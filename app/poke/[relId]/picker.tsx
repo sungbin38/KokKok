@@ -150,40 +150,41 @@ export default function PickerScreen() {
         })}
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{ flexGrow: 0, flexShrink: 0 }}
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          gap: 8,
-          paddingVertical: 8,
-          alignItems: 'center',
-        }}
-      >
-        {([ALL, ...CATEGORIES] as const).map((cat) => (
-          <Pressable
-            key={cat}
-            onPress={() => setCategory(cat)}
-            style={{
-              paddingVertical: 8,
-              paddingHorizontal: 14,
-              borderRadius: 999,
-              backgroundColor:
-                category === cat ? colors.coral : colors.paperCool,
-            }}
-          >
-            <Text
+      <View style={{ height: 56 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            gap: 8,
+            paddingVertical: 8,
+            alignItems: 'center',
+          }}
+        >
+          {([ALL, ...CATEGORIES] as const).map((cat) => (
+            <Pressable
+              key={cat}
+              onPress={() => setCategory(cat)}
               style={{
-                color: category === cat ? colors.white : colors.inkSoft,
-                fontWeight: '600',
+                paddingVertical: 8,
+                paddingHorizontal: 14,
+                borderRadius: 999,
+                backgroundColor:
+                  category === cat ? colors.coral : colors.paperCool,
               }}
             >
-              {cat}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+              <Text
+                style={{
+                  color: category === cat ? colors.white : colors.inkSoft,
+                  fontWeight: '600',
+                }}
+              >
+                {cat}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
 
       <FlatList
         data={visible}
