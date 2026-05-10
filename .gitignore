@@ -25,10 +25,18 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+*.log
+logs/
 
-# macOS
+# macOS / OS junk
 .DS_Store
+Thumbs.db
 *.pem
+
+# IDE
+.idea/
+*.swp
+*.swo
 
 # local env files
 .env*.local
@@ -36,8 +44,27 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# coverage / test output
+coverage/
+
 app-example
 
 # generated native folders
 /ios
 /android
+
+# Firebase secrets — 절대 커밋하지 말 것
+GoogleService-Info.plist
+google-services.json
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+functions/.runtimeconfig.json
+
+# Cloud Functions build
+functions/lib/
+functions/node_modules/
+
+# Env
+.env
+.env.local

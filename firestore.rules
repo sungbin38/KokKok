@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(relId) {
+      return isSignedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/relationships/$(relId)).data.members;
+    }
+
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(
+          ['displayName', 'photoURL', 'fcmTokens', 'favoriteEmojis']
+        );
+      allow delete: if false;
+    }
+
+    match /relationships/{relId} {
+      allow read: if isSignedIn() && request.auth.uid in resource.data.members;
+      // 생성·수정은 Cloud Function (Admin SDK)만. 클라에서 직접 못 만듦.
+      allow write: if false;
+
+      // lastPokeAt / lastPokeEmojiId 만 멤버가 머지 업데이트 가능 — pokes 발송 시 갱신.
+      allow update: if isSignedIn()
+        && request.auth.uid in resource.data.members
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(
+          ['lastPokeAt', 'lastPokeEmojiId']
+        );
+    }
+
+    match /inviteCodes/{code} {
+      // 코드를 알아야 읽을 수 있음 (초대 코드 입력 흐름)
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.ownerUid == request.auth.uid;
+      // 사용 처리·삭제는 Cloud Function 전용
+      allow update, delete: if false;
+    }
+
+    match /pokes/{pokeId} {
+      allow read: if isSignedIn()
+        && (request.auth.uid == resource.data.fromUid
+          || request.auth.uid == resource.data.toUid);
+      allow create: if isSignedIn()
+        && request.resource.data.fromUid == request.auth.uid
+        && isMember(request.resource.data.relId)
+        && request.resource.data.toUid in get(
+            /databases/$(database)/documents/relationships/$(request.resource.data.relId)
+          ).data.members
+        && request.resource.data.fromUid != request.resource.data.toUid;
+      allow update, delete: if false;
+    }
+
+    match /emojis/{id} {
+      allow read: if isSignedIn();
+      allow write: if false; // 관리자 콘솔/CLI로만
+    }
+  }
+}
