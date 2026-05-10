@@ -153,7 +153,13 @@ export default function PickerScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingVertical: 8 }}
+        style={{ flexGrow: 0, flexShrink: 0 }}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          gap: 8,
+          paddingVertical: 8,
+          alignItems: 'center',
+        }}
       >
         {([ALL, ...CATEGORIES] as const).map((cat) => (
           <Pressable

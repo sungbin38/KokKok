@@ -52,7 +52,7 @@ export const DEMO_RELATIONSHIPS: RelationshipDoc[] = [
     id: 'rel-mom',
     members: [DEMO_UID, 'partner-mom'],
     nicknames: nicks('partner-mom', '엄마'),
-    lastPokeAt: ts(5 * MIN),
+    lastPokeAt: ts(7 * MIN),
     lastPokeEmojiId: 'heart',
     createdAt: ts(60 * DAY),
   },
@@ -83,7 +83,7 @@ export const DEMO_RELATIONSHIPS: RelationshipDoc[] = [
 ];
 
 export const DEMO_POKES: PokeDoc[] = [
-  // rel-mom
+  // rel-mom — 가장 최근 = partner-mom 보냄 (콕 받음)
   {
     id: 'p-mom-1',
     fromUid: 'partner-mom',
@@ -91,7 +91,7 @@ export const DEMO_POKES: PokeDoc[] = [
     relId: 'rel-mom',
     emojiId: 'heart',
     replyToPokeId: null,
-    createdAt: ts(5 * MIN),
+    createdAt: ts(7 * MIN),
   },
   {
     id: 'p-mom-2',
@@ -112,7 +112,7 @@ export const DEMO_POKES: PokeDoc[] = [
     createdAt: ts(6 * HOUR),
   },
 
-  // rel-love
+  // rel-love — 가장 최근 = partner-love 보냄 (콕 받음)
   {
     id: 'p-love-1',
     fromUid: 'partner-love',
@@ -141,11 +141,11 @@ export const DEMO_POKES: PokeDoc[] = [
     createdAt: ts(20 * HOUR),
   },
 
-  // rel-friend
+  // rel-friend — 가장 최근 = 내가 보냄 (마지막 콕)
   {
     id: 'p-friend-1',
-    fromUid: 'partner-friend',
-    toUid: DEMO_UID,
+    fromUid: DEMO_UID,
+    toUid: 'partner-friend',
     relId: 'rel-friend',
     emojiId: 'thumbs-up',
     replyToPokeId: null,
@@ -153,19 +153,19 @@ export const DEMO_POKES: PokeDoc[] = [
   },
   {
     id: 'p-friend-2',
-    fromUid: DEMO_UID,
-    toUid: 'partner-friend',
+    fromUid: 'partner-friend',
+    toUid: DEMO_UID,
     relId: 'rel-friend',
     emojiId: 'crying-laugh',
     replyToPokeId: null,
     createdAt: ts(2 * DAY),
   },
 
-  // rel-bro
+  // rel-bro — 가장 최근 = 내가 보냄 (마지막 콕)
   {
     id: 'p-bro-1',
-    fromUid: 'partner-bro',
-    toUid: DEMO_UID,
+    fromUid: DEMO_UID,
+    toUid: 'partner-bro',
     relId: 'rel-bro',
     emojiId: 'burger',
     replyToPokeId: null,
@@ -173,8 +173,35 @@ export const DEMO_POKES: PokeDoc[] = [
   },
 ];
 
+// 데모 시연용 보조 상태.
+const DEMO_UNREAD_REL_IDS = new Set<string>(['rel-mom', 'rel-love']);
+const DEMO_FAVORITE_REL_IDS = new Set<string>(['rel-mom']);
+
+export function isDemoUnread(relId: string): boolean {
+  return DEMO_UNREAD_REL_IDS.has(relId);
+}
+
+export function isDemoFavorite(relId: string): boolean {
+  return DEMO_FAVORITE_REL_IDS.has(relId);
+}
+
+export function demoLastPokeReceived(relId: string): boolean {
+  const last = DEMO_POKES.filter((p) => p.relId === relId).sort(
+    (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis(),
+  )[0];
+  return last ? last.toUid === DEMO_UID : false;
+}
+
 export function findDemoPoke(pokeId: string): PokeDoc | null {
   return DEMO_POKES.find((p) => p.id === pokeId) ?? null;
+}
+
+// 데모: 안 읽은 콕 중 가장 최근 받은 poke 1개. 시연용 진입점에 사용.
+export function demoLatestUnreadReceivedPoke(): PokeDoc | null {
+  const candidates = DEMO_POKES.filter(
+    (p) => DEMO_UNREAD_REL_IDS.has(p.relId) && p.toUid === DEMO_UID,
+  ).sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+  return candidates[0] ?? null;
 }
 
 export function demoPokesFor(
