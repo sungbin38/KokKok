@@ -296,7 +296,7 @@ export default function PokeScreen() {
             flex: 1,
             paddingHorizontal: 20,
             paddingTop: 20,
-            paddingBottom: Math.max(insets.bottom, 12) + 16,
+            paddingBottom: Math.max(insets.bottom, 20) + 32,
           }}
         >
           <View
@@ -338,17 +338,18 @@ export default function PokeScreen() {
             style={({ pressed }) => ({
               alignSelf: 'center',
               marginTop: 'auto',
-              paddingTop: 18,
-              paddingBottom: 8,
-              paddingHorizontal: 16,
-              opacity: pressed ? 0.6 : 1,
+              paddingVertical: 12,
+              paddingHorizontal: 18,
+              borderRadius: 999,
+              backgroundColor: colors.redSoft,
+              opacity: pressed ? 0.7 : 1,
             })}
           >
             <Text
               style={{
                 color: colors.red,
                 fontWeight: '700',
-                fontSize: 14,
+                fontSize: 13,
                 letterSpacing: -0.2,
                 textAlign: 'center',
               }}
