@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 const firestoreModule = require('@react-native-firebase/firestore');
 const firestore: any = firestoreModule.default ?? firestoreModule;
@@ -38,6 +38,7 @@ export default function PokeScreen() {
   // 데모 모드: DEMO_USER 의 mutable favoriteEmojis 를 매 bump 마다 직접 읽음
   // (useUser useEffect 타이밍에 의존하지 않게).
   useDemoVersion();
+  const insets = useSafeAreaInsets();
   const { send, pending } = useSendPoke();
   const [rel, setRel] = useState<RelationshipDoc | null>(null);
   const sentPokes = usePokesForRelationship(relId ?? null, 'sent', uid);
@@ -95,7 +96,7 @@ export default function PokeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <MiniNav
           left={
             <NavIconButton onPress={() => router.back()}>
@@ -295,7 +296,7 @@ export default function PokeScreen() {
             flex: 1,
             paddingHorizontal: 20,
             paddingTop: 20,
-            paddingBottom: 16,
+            paddingBottom: Math.max(insets.bottom, 12) + 16,
           }}
         >
           <View
@@ -333,11 +334,13 @@ export default function PokeScreen() {
                 params: { relId: relId! },
               })
             }
+            hitSlop={8}
             style={({ pressed }) => ({
               alignSelf: 'center',
               marginTop: 'auto',
-              paddingTop: 16,
-              paddingBottom: 4,
+              paddingTop: 18,
+              paddingBottom: 8,
+              paddingHorizontal: 16,
               opacity: pressed ? 0.6 : 1,
             })}
           >
@@ -347,6 +350,7 @@ export default function PokeScreen() {
                 fontWeight: '700',
                 fontSize: 14,
                 letterSpacing: -0.2,
+                textAlign: 'center',
               }}
             >
               + 다른 이모지 / 즐겨찾기 편집
