@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, FlatList, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -20,13 +20,20 @@ export default function PickerScreen() {
   const uid = useCurrentUid();
   const router = useRouter();
   const { user } = useUser(uid);
-  const initial = user?.favoriteEmojis?.length
-    ? user.favoriteEmojis.slice(0, 6)
-    : [...DEFAULT_FAVORITES];
-  const [favorites, setFavorites] = useState<string[]>(initial);
+  const [favorites, setFavorites] = useState<string[]>(() => [...DEFAULT_FAVORITES]);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [category, setCategory] = useState<EmojiCategory | '전체'>(ALL);
   const [saving, setSaving] = useState(false);
+  // user 가 처음 로드될 때 1회만 favorites 를 동기화. 이후 사용자의 편집을 덮어쓰지 않음.
+  const hydrated = useRef(false);
+  useEffect(() => {
+    if (hydrated.current) return;
+    if (!user) return;
+    hydrated.current = true;
+    if (user.favoriteEmojis?.length) {
+      setFavorites(user.favoriteEmojis.slice(0, 6));
+    }
+  }, [user]);
 
   const visible = useMemo(
     () =>
