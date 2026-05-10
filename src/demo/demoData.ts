@@ -53,7 +53,7 @@ export const DEMO_RELATIONSHIPS: RelationshipDoc[] = [
     members: [DEMO_UID, 'partner-mom'],
     nicknames: nicks('partner-mom', '엄마'),
     lastPokeAt: ts(7 * MIN),
-    lastPokeEmojiId: 'heart',
+    lastPokeEmojiId: 'rice',
     createdAt: ts(60 * DAY),
   },
   {
@@ -61,7 +61,7 @@ export const DEMO_RELATIONSHIPS: RelationshipDoc[] = [
     members: [DEMO_UID, 'partner-love'],
     nicknames: nicks('partner-love', '연인'),
     lastPokeAt: ts(2 * HOUR),
-    lastPokeEmojiId: 'lips',
+    lastPokeEmojiId: 'ramen',
     createdAt: ts(40 * DAY),
   },
   {
@@ -83,13 +83,13 @@ export const DEMO_RELATIONSHIPS: RelationshipDoc[] = [
 ];
 
 export const DEMO_POKES: PokeDoc[] = [
-  // rel-mom — 가장 최근 = partner-mom 보냄 (콕 받음)
+  // rel-mom — 가장 최근 = partner-mom 보냄 (콕 받음, 음식 테마)
   {
     id: 'p-mom-1',
     fromUid: 'partner-mom',
     toUid: DEMO_UID,
     relId: 'rel-mom',
-    emojiId: 'heart',
+    emojiId: 'rice', // "밥 먹었어?"
     replyToPokeId: null,
     createdAt: ts(7 * MIN),
   },
@@ -98,7 +98,7 @@ export const DEMO_POKES: PokeDoc[] = [
     fromUid: DEMO_UID,
     toUid: 'partner-mom',
     relId: 'rel-mom',
-    emojiId: 'wave',
+    emojiId: 'pleading', // "배고파ㅠㅠ"
     replyToPokeId: null,
     createdAt: ts(40 * MIN),
   },
@@ -107,18 +107,18 @@ export const DEMO_POKES: PokeDoc[] = [
     fromUid: 'partner-mom',
     toUid: DEMO_UID,
     relId: 'rel-mom',
-    emojiId: 'pleading',
+    emojiId: 'apple', // "사과 먹어"
     replyToPokeId: null,
     createdAt: ts(6 * HOUR),
   },
 
-  // rel-love — 가장 최근 = partner-love 보냄 (콕 받음)
+  // rel-love — 가장 최근 = partner-love 보냄 (콕 받음, 음식 테마)
   {
     id: 'p-love-1',
     fromUid: 'partner-love',
     toUid: DEMO_UID,
     relId: 'rel-love',
-    emojiId: 'lips',
+    emojiId: 'ramen', // "라멘 같이 먹자"
     replyToPokeId: null,
     createdAt: ts(2 * HOUR),
   },
@@ -127,7 +127,7 @@ export const DEMO_POKES: PokeDoc[] = [
     fromUid: DEMO_UID,
     toUid: 'partner-love',
     relId: 'rel-love',
-    emojiId: 'sparkle-heart',
+    emojiId: 'pleading', // "배고파"
     replyToPokeId: null,
     createdAt: ts(3 * HOUR),
   },
@@ -136,7 +136,7 @@ export const DEMO_POKES: PokeDoc[] = [
     fromUid: 'partner-love',
     toUid: DEMO_UID,
     relId: 'rel-love',
-    emojiId: 'hug',
+    emojiId: 'coffee', // "커피 한잔?"
     replyToPokeId: null,
     createdAt: ts(20 * HOUR),
   },
