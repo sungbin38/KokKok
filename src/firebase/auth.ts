@@ -1,10 +1,11 @@
 import { Platform } from 'react-native';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import auth, {
-  FirebaseAuthTypes,
-} from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
+const authModule = require('@react-native-firebase/auth');
+const auth: any = authModule.default ?? authModule;
+const firestoreModule = require('@react-native-firebase/firestore');
+const firestore: any = firestoreModule.default ?? firestoreModule;
 
 let googleConfigured = false;
 

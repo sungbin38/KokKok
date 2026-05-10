@@ -5,18 +5,14 @@ interface Props {
   uri?: string | null;
   name: string;
   size?: number;
-  /** Hue (0–360) for the gradient-style background. Defaults to a warm tone. */
+  /** Hue (0–360) for the avatar tint. Defaults to a warm tone. */
   hue?: number;
 }
 
-/**
- * Avatar with a single-letter initial. Background is a warm two-stop
- * gradient approximated with a tinted view (no native gradient dep).
- */
 export function Avatar({ uri, name, size = 48, hue = 18 }: Props) {
   const initial = name.trim().charAt(0).toUpperCase() || '?';
-  const top = `hsl(${hue}, 80%, 70%)`;
-  const bottom = `hsl(${(hue + 30) % 360}, 80%, 60%)`;
+  const base = `hsl(${hue}, 72%, 64%)`;
+  const highlight = `hsla(${hue}, 90%, 90%, 0.55)`;
 
   return (
     <View
@@ -24,26 +20,26 @@ export function Avatar({ uri, name, size = 48, hue = 18 }: Props) {
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: bottom,
+        backgroundColor: base,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
         shadowColor: '#1B1612',
-        shadowOpacity: 0.12,
+        shadowOpacity: 0.1,
         shadowRadius: 6,
         shadowOffset: { width: 0, height: 3 },
         elevation: 2,
       }}
     >
-      {/* faux gradient — top-half lighter overlay */}
       <View
         style={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: size / 2,
-          backgroundColor: top,
+          top: -size * 0.25,
+          left: -size * 0.1,
+          width: size * 0.7,
+          height: size * 0.7,
+          borderRadius: size,
+          backgroundColor: highlight,
         }}
       />
       {uri ? (
@@ -55,6 +51,7 @@ export function Avatar({ uri, name, size = 48, hue = 18 }: Props) {
             fontSize: size * 0.42,
             fontWeight: '700',
             letterSpacing: -0.5,
+            includeFontPadding: false,
           }}
         >
           {initial}

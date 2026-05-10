@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { router } from 'expo-router';
-import messaging from '@react-native-firebase/messaging';
+const messagingModule = require('@react-native-firebase/messaging');
+const messaging: any = messagingModule.default ?? messagingModule;
 import {
   registerDeviceToken,
   onTokenRefresh,

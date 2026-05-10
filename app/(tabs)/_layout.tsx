@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/theme';
 
 export default function TabsLayout() {
@@ -24,8 +24,12 @@ export default function TabsLayout() {
         name="home"
         options={{
           title: '홈',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 22 }}>🏠</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'home' : 'home-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
@@ -33,8 +37,12 @@ export default function TabsLayout() {
         name="history"
         options={{
           title: '히스토리',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 22 }}>💬</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'time' : 'time-outline'}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
@@ -42,8 +50,12 @@ export default function TabsLayout() {
         name="me"
         options={{
           title: '나',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 22 }}>🙂</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'person-circle' : 'person-circle-outline'}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />

@@ -60,7 +60,7 @@ export default function Home() {
             contentContainerStyle={{
               paddingHorizontal: 16,
               paddingBottom: 24,
-              gap: 8,
+              gap: 10,
             }}
             renderItem={({ item, index }) => {
               const nickname = item.nicknames?.[uid ?? ''] ?? '친구';
@@ -78,21 +78,26 @@ export default function Home() {
                   }
                   style={({ pressed }) => [
                     {
+                      width: '100%',
+                      alignSelf: 'stretch',
                       flexDirection: 'row',
                       alignItems: 'center',
-                      padding: 16,
+                      paddingVertical: 14,
+                      paddingHorizontal: 16,
                       borderRadius: radius.lg,
                       backgroundColor: colors.surface,
-                      gap: 16,
+                      borderWidth: 1,
+                      borderColor: colors.hairline,
                       opacity: pressed ? 0.85 : 1,
                       transform: [{ scale: pressed ? 0.99 : 1 }],
                     },
-                    shadow.cardSoft,
+                    shadow.card,
                   ]}
                 >
-                  <Avatar name={nickname} size={56} hue={hue} />
-                  <View style={{ flex: 1 }}>
+                  <Avatar name={nickname} size={52} hue={hue} />
+                  <View style={{ flex: 1, minWidth: 0, marginLeft: 14 }}>
                     <Text
+                      numberOfLines={1}
                       style={{
                         fontSize: 17,
                         fontWeight: '700',
@@ -102,7 +107,10 @@ export default function Home() {
                     >
                       {nickname}
                     </Text>
-                    <Text style={{ color: colors.inkSoft, marginTop: 2, fontSize: 13 }}>
+                    <Text
+                      numberOfLines={1}
+                      style={{ color: colors.inkSoft, marginTop: 2, fontSize: 13 }}
+                    >
                       {item.lastPokeAt ? timeAgo(item.lastPokeAt) : '아직 콕 없음'}
                     </Text>
                   </View>
@@ -115,18 +123,10 @@ export default function Home() {
                         backgroundColor: colors.surfaceAlt,
                         alignItems: 'center',
                         justifyContent: 'center',
+                        marginLeft: 12,
                       }}
                     >
-                      <Text
-                        style={{
-                          fontSize: 24,
-                          textShadowColor: 'rgba(0,0,0,0.18)',
-                          textShadowOffset: { width: 0, height: 3 },
-                          textShadowRadius: 4,
-                        }}
-                      >
-                        {lastEmoji.fallback}
-                      </Text>
+                      <Text style={{ fontSize: 24 }}>{lastEmoji.fallback}</Text>
                     </View>
                   )}
                 </Pressable>

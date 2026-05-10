@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * "콕콕!" wordmark — the leading 콕 carries a bouncing red dot.
+ * "콕콕!" wordmark — the leading 콕 carries a bouncing red dot above its ㅗ.
  */
 export function KokLogo({ size = 56, dark = false, animated = true }: Props) {
   const bob = useRef(new Animated.Value(0)).current;
@@ -36,70 +36,52 @@ export function KokLogo({ size = 56, dark = false, animated = true }: Props) {
     return () => loop.stop();
   }, [animated, bob]);
 
-  const dot = size * 0.22;
+  const dot = size * 0.2;
+  const dotMargin = size * 0.18;
   const ink = dark ? colors.dText : colors.ink;
   const translateY = bob.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -size * 0.08],
   });
 
+  const wordStyle = {
+    fontSize: size,
+    lineHeight: size * 1.05,
+    fontWeight: '800' as const,
+    color: ink,
+    letterSpacing: -0.02 * size,
+    includeFontPadding: false,
+  };
+
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-      }}
-    >
-      <View style={{ paddingTop: size * 0.32 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+      <View style={{ paddingTop: dot + dotMargin }}>
         <Animated.View
           style={{
             position: 'absolute',
+            top: 0,
             left: '50%',
             marginLeft: -dot / 2,
-            top: size * 0.04,
             width: dot,
             height: dot,
             borderRadius: dot / 2,
             backgroundColor: colors.red,
             transform: [{ translateY }],
             shadowColor: colors.red,
-            shadowOpacity: 0.5,
-            shadowRadius: size * 0.16,
+            shadowOpacity: 0.45,
+            shadowRadius: size * 0.14,
             shadowOffset: { width: 0, height: size * 0.05 },
             elevation: 4,
           }}
         />
-        <Text
-          style={{
-            fontSize: size,
-            lineHeight: size * 1.05,
-            fontWeight: '800',
-            color: ink,
-            letterSpacing: -0.02 * size,
-          }}
-        >
-          콕
-        </Text>
+        <Text style={wordStyle}>콕</Text>
       </View>
+      <Text style={[wordStyle, { marginLeft: size * 0.04 }]}>콕</Text>
       <Text
-        style={{
-          fontSize: size,
-          lineHeight: size * 1.05,
-          fontWeight: '800',
-          color: ink,
-          letterSpacing: -0.02 * size,
-        }}
-      >
-        콕
-      </Text>
-      <Text
-        style={{
-          fontSize: size,
-          lineHeight: size * 1.05,
-          fontWeight: '800',
-          color: colors.red,
-          marginLeft: size * 0.04,
-        }}
+        style={[
+          wordStyle,
+          { color: colors.red, marginLeft: size * 0.04 },
+        ]}
       >
         !
       </Text>

@@ -1,8 +1,9 @@
 import { Platform } from 'react-native';
-import messaging, {
-  FirebaseMessagingTypes,
-} from '@react-native-firebase/messaging';
-import firestore from '@react-native-firebase/firestore';
+import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
+const messagingModule = require('@react-native-firebase/messaging');
+const messaging: any = messagingModule.default ?? messagingModule;
+const firestoreModule = require('@react-native-firebase/firestore');
+const firestore: any = firestoreModule.default ?? firestoreModule;
 
 export async function requestPushPermission(): Promise<boolean> {
   const status = await messaging().requestPermission();

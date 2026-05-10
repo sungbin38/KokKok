@@ -1,6 +1,7 @@
-import firestore, {
-  FirebaseFirestoreTypes,
-} from '@react-native-firebase/firestore';
+// RNFB v22 + Hermes ESM/CJS default-export interop fix.
+import type { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+const firestoreModule = require('@react-native-firebase/firestore');
+const firestore: any = firestoreModule.default ?? firestoreModule;
 import { useEffect, useState } from 'react';
 import {
   EmojiDoc,

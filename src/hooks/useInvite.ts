@@ -1,7 +1,10 @@
 import { useCallback, useState } from 'react';
-import functions from '@react-native-firebase/functions';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+const functionsModule = require('@react-native-firebase/functions');
+const authModule = require('@react-native-firebase/auth');
+const firestoreModule = require('@react-native-firebase/firestore');
+const functions: any = functionsModule.default ?? functionsModule;
+const auth: any = authModule.default ?? authModule;
+const firestore: any = firestoreModule.default ?? firestoreModule;
 import { generateInviteCode } from '@/utils/inviteCode';
 
 const TTL_HOURS = 24;
